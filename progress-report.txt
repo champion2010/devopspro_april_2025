@@ -42,9 +42,17 @@ xxx 04/02/2025 xxx
 - Practised with docker commands; docker ps, docker ps -a, docker images, docker rmi <image-name>, docker stop <con-name>, docker rm <con-name>, docker run -d --name <your-con-name> -p <desired-port:tomcat-port> <image-name> etc
 - Exec into a runing container $ docker exec -it <con-name> /bin/bash
 - Copied webapps.list content ./* into webapps dir
-- Ran a single command to pulled image and at the same time give a runing container
+- Ran a single command to pulled image and at the same time give a running container
 $ docker run -d --name <con-name> -p <desired-port:tomcat-port> tomcat:latest
 $ docker exec -it <con-name> /bin/bash
 # docker cp -r /usr/local/tomcat/webapps.dist/* /usr/local/tomcat/webapps
-- Set up a dockerfile
-  
+
+xxx 06/02/2025 xxx
+- Set up a dockerfile to copy content of webapps.dist to webapps
+- Ran buid command on the docker file $ docker build -t <image-name> .  [the dot is the very essential] 
+- Cheched for the image build by dockerfile $ docker images
+- Ran the image into a container $ docker run -d --name <container-name> -p <desired-port:8080> <image-name>
+- Checked the browser for the app using <pub-ip-addr>:<desired-port>  successful
+
+
+
