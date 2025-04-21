@@ -1,6 +1,6 @@
 xxx 21/01/2025 xxx
 - Lauched project workstation 
-- Server PW: vmtech
+- Server PW: password123
 - Cloned remote repo to local repo, only
 - Installed Java 17 and created environment variable
 - Installed Maven and created environment variable
@@ -53,6 +53,6 @@ xxx 06/02/2025 xxx
 - Cheched for the image build by dockerfile $ docker images
 - Ran the image into a container $ docker run -d --name <container-name> -p <desired-port:8080> <image-name>
 - Checked the browser for the app using <pub-ip-addr>:<desired-port>  successful
-
+- setup a webhook trigger
 
 
