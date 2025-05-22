@@ -1,0 +1,62 @@
+# Create Custom Container Image and Push to DockerHub Registry
+---
+- hosts: localhost
+  become: yes
+  tasks:
+
+    - name: Install required system packages
+      apt:
+        name:
+          - python3-pip
+          - docker.io
+        state: present
+        update_cache: yes
+
+    - name: Install Docker SDK for Python using --break-system-packages
+      command: >
+        python3 -m pip install docker --break-system-packages
+      register: pip_install_result
+      changed_when: "'Successfully installed' in pip_install_result.stdout or 'Requirement already satisfied' in pip_install_result.stdout"
+      failed_when: pip_install_result.rc != 0
+
+    - name: Ensure Docker service is running
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Pull .war artifact from Artifactory
+      get_url:
+        url: http://13.219.246.71:8082/artifactory/project-a-libs-release-local/com/vmtech/vmtech/1.0-RELEASE/vmtech-1.0-RELEASE.war
+        dest: /home/ubuntu
+        url_username: admin
+        url_password: Password123
+
+    - name: Pull Tomcat Container Image
+      community.docker.docker_image:
+        name: tomcat:latest
+        source: pull
+        force_tag: yes
+
+    - name: Build Docker image with build args
+      community.docker.docker_image:
+        name: champion2010/devopspro_april_2025
+        tag: "{{ build_number }}"
+        build:
+          path: /home/ubuntu
+          args:
+            listen_port: 8080
+        source: build
+        force_source: yes
+
+    - name: Log in to DockerHub
+      community.docker.docker_login:
+        username: champion2010
+        password: "password123"
+
+    - name: Push image to DockerHub
+      community.docker.docker_image:
+        name: champion2010/devopspro_april_2025
+        tag: "{{ build_number }}"
+        push: yes
+        source: local
