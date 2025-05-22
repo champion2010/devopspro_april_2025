@@ -1,0 +1,40 @@
+#Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: olu-deploy
+  labels:
+    app: olu-app
+spec:
+ replicas: 5
+ selector:
+   matchLabels:
+     app: olu-app
+ template:
+   metadata:
+     labels:
+       app: olu-app
+   spec:
+     containers:
+     - name: olu-con
+       image: champion2010/devopspro_april_2025:21042025-0957pm
+       ports:
+       - containerPort: 8080
+
+---
+#Service Type nodePort
+apiVersion: v1
+kind: Service
+metadata:
+  name: olu-service
+  labels:
+    app: olu-app
+spec:
+  selector:
+    app: olu-app
+  type: NodePort
+  ports:
+  - nodePort: 31000
+    port: 8080
+    targetPort: 8080
+
