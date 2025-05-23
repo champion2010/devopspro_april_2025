@@ -2,6 +2,8 @@
 ---
 - hosts: localhost
   become: yes
+  vars:
+    build_number: "v1"  # Change or override this in your CI/CD
   tasks:
 
     - name: Install required system packages
@@ -28,9 +30,17 @@
     - name: Pull .war artifact from Artifactory
       get_url:
         url: http://13.219.246.71:8082/artifactory/project-a-libs-release-local/com/vmtech/vmtech/1.0-RELEASE/vmtech-1.0-RELEASE.war
-        dest: /home/ubuntu
+        dest: /home/ubuntu/vmtech-1.0-RELEASE.war
         url_username: admin
         url_password: Password123
+
+    - name: Rename WAR file to match Dockerfile expectation
+      command: mv /home/ubuntu/vmtech-1.0-RELEASE.war /home/ubuntu/webapp.war
+
+    - name: Copy Dockerfile to build context
+      copy:
+        src: ./Dockerfile
+        dest: /home/ubuntu/Dockerfile
 
     - name: Pull Tomcat Container Image
       community.docker.docker_image:
@@ -60,3 +70,4 @@
         tag: "{{ build_number }}"
         push: yes
         source: local
+
