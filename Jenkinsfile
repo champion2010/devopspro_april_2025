@@ -116,8 +116,7 @@ pipeline {
             
             steps {
                   sshagent(['ssh_agent']) {
-                        //sh "ssh -i workstation-kp.pem -o StrictHostKeyChecking=no ubuntu@52.4.164.113 -C \"kubectl set image deployment/ranty customcontainer=
-champion2010/devopspro_april_2025:${BUILD_NUMBER}\"" 
+                        //sh "ssh -i workstation-kp.pem -o StrictHostKeyChecking=no ubuntu@52.4.164.113 -C \"kubectl set image deployment/ranty customcontainer=champion2010/devopspro_april_2025:${BUILD_NUMBER}\"" 
                         //sh "ssh -i workstation-kp.pem -o StrictHostKeyChecking=no ubuntu@52.4.164.113 -C \"kubectl delete deployment ranty && kubectl delete service ranty\""
                         sh "ssh -i workstation-kp.pem -o StrictHostKeyChecking=no ubuntu@52.4.164.113 -C \"kubectl apply -f deploy_service.yaml\""
                         //sh "ssh -i workstation-kp.pem -o StrictHostKeyChecking=no ubuntu@52.4.164.113 -C \"kubectl apply -f service.yaml\""
