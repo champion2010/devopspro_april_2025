@@ -39,7 +39,7 @@
 
     - name: Copy Dockerfile to build context
       copy:
-        src: ./dockerfile  # Using full path and correct case
+        src: dockerfile  # Using full path and correct case
         dest: /home/ubuntu/Dockerfile # Destination with proper case
         remote_src: yes               # Look for file on remote host
 
