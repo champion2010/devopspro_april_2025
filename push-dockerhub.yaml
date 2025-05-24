@@ -15,7 +15,8 @@
         update_cache: yes
 
     - name: Install Docker SDK for Python
-      command: python3 -m pip install docker
+      command: >
+        python3 -m pip install docker
       register: pip_install_result
       changed_when: "'Successfully installed' in pip_install_result.stdout or 'Requirement already satisfied' in pip_install_result.stdout"
       failed_when: pip_install_result.rc != 0
@@ -38,8 +39,9 @@
 
     - name: Copy Dockerfile to build context
       copy:
-        src: ./Dockerfile
-        dest: /home/ubuntu/Dockerfile
+        src: /home/ubuntu/dockerfile  # Using full path and correct case
+        dest: /home/ubuntu/Dockerfile # Destination with proper case
+        remote_src: yes               # Look for file on remote host
 
     - name: Pull Tomcat Container Image
       community.docker.docker_image:
@@ -69,4 +71,3 @@
         tag: "{{ build_number }}"
         push: yes
         source: local
-
