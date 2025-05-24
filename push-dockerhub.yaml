@@ -14,9 +14,8 @@
         state: present
         update_cache: yes
 
-    - name: Install Docker SDK for Python using --break-system-packages
-      command: >
-        python3 -m pip install docker --break-system-packages
+    - name: Install Docker SDK for Python
+      command: python3 -m pip install docker
       register: pip_install_result
       changed_when: "'Successfully installed' in pip_install_result.stdout or 'Requirement already satisfied' in pip_install_result.stdout"
       failed_when: pip_install_result.rc != 0
