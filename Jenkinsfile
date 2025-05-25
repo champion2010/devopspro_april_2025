@@ -130,9 +130,13 @@ pipeline {
       steps {
         sshagent(credentials: ['default-k8s-access']) {
           sh """
-            # Apply deployment with explicit permissions
+            # Option 1: Use kubectl set image with correct tag
             ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@52.4.164.113 \
-              "kubectl apply -f /home/ubuntu/deploy_service.yaml"
+              "kubectl set image deployment/olu-deploy olu-con=champion2010/devopspro_april_2025:${BUILD_NUMBER} --record"
+
+            # Optional: Wait for rollout to complete
+            ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@52.4.164.113 \
+              "kubectl rollout status deployment/olu-deploy"
           """
           //sh "ssh -o StrictHostKeyChecking=no ubuntu@52.4.164.113 -C \"kubectl set image deployment/ranty customcontainer=champion2010/devopspro_april_2025:${BUILD_NUMBER}\"" 
           //sh "ssh -o StrictHostKeyChecking=no ubuntu@52.4.164.113 -C \"kubectl delete deployment ranty && kubectl delete service ranty\""
@@ -141,7 +145,7 @@ pipeline {
       }  
     } 
   }
-  
+
   post {
     always {
       cleanWs()
@@ -153,3 +157,4 @@ pipeline {
     }
   }
 }
+
