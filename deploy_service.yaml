@@ -17,7 +17,7 @@ spec:
    spec:
      containers:
      - name: olu-con
-       image: champion2010/devopspro_april_2025:21042025-0957pm
+       image: champion2010/devopspro_april_2025:{{ build_number }}
        ports:
        - containerPort: 8080
 
