@@ -5,21 +5,15 @@ pipeline {
   }
 
   stages {
-    stage('Checkout SCM') {
+    stage ('Checkout SCM'){
       steps {
-        checkout([$class: 'GitSCM', 
-                 branches: [[name: '*/master']], 
-                 doGenerateSubmoduleConfigurations: false, 
-                 extensions: [], 
-                 submoduleCfg: [], 
-                 userRemoteConfigs: [[credentialsId: 'git', 
-                                    url: 'https://github.com/champion2010/devopspro_april_2025.git']]])
+        checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'git', url: 'https://github.com/champion2010/devopspro_april_2025.git']]])
       }
     }
 
-    stage('Build') {
+    stage ('Build') {
       steps {
-        dir('webapp') {
+        dir('webapp'){
           sh "pwd"
           sh "ls -lah"
           sh "mvn package"
@@ -27,43 +21,55 @@ pipeline {
       }
     }
 
-    stage('SonarQube Analysis') {
+    stage ('SonarQube Analysis') {
       steps {
         withSonarQubeEnv('sonar') {
-          dir('webapp') {
+          dir('webapp'){
             sh 'mvn -U clean install sonar:sonar'
           }
         }
       }
     }
 
-    stage('Artifactory configuration') {
+    //stage ('Artifactory configuration') {
+    //        steps {
+    //            rtServer (
+    //                id: "jfrog",
+    //                url: "http://13.219.246.71:8082/artifactory",
+    //                credentialsId: "jfrog"
+    //                                                                )
+    //
+    //            rtMavenDeployer (
+    //                id: "MAVEN_DEPLOYER",
+    //                serverId: "jfrog",
+    //                releaseRepo: "project-a-libs-release-local",
+    //                snapshotRepo: "project-a-libs-snapshot-local"
+    //            )
+    //
+    //            rtMavenResolver (
+    //                id: "MAVEN_RESOLVER",
+    //                serverId: "jfrog", // credential ID from Jenkins global credentials
+    //                releaseRepo: "project-a-libs-release-local",
+    //                snapshotRepo: "project-a-libs-snapshot-local"
+    //            )
+    //        }
+    //}
+
+    //stage ('Deploy Artifacts') {
+    //        steps {
+    //            rtMavenRun (
+    //                tool: "Maven", // Tool name from Jenkins configuration
+    //                pom: 'webapp/pom.xml',
+    //                goals: 'clean install',
+    //                deployerId: "MAVEN_DEPLOYER",
+    //                resolverId: "MAVEN_RESOLVER"
+    //            )
+    //         }
+    //  }
+
+    stage ('Publish build info') {
       steps {
-        rtServer(
-          id: "jfrog",
-          url: "http://13.219.246.71:8082/artifactory",
-          credentialsId: "jfrog"
-        )
-
-        rtMavenDeployer(
-          id: "MAVEN_DEPLOYER",
-          serverId: "jfrog",
-          releaseRepo: "project-a-libs-release-local",
-          snapshotRepo: "project-a-libs-snapshot-local"
-        )
-
-        rtMavenResolver(
-          id: "MAVEN_RESOLVER",
-          serverId: "jfrog",
-          releaseRepo: "project-a-libs-release-local",
-          snapshotRepo: "project-a-libs-snapshot-local"
-        )
-      }
-    }
-
-    stage('Publish build info') {
-      steps {
-        rtPublishBuildInfo(
+        rtPublishBuildInfo (
           serverId: "jfrog"
         )
       }
@@ -87,7 +93,7 @@ pipeline {
       }
     }
 
-    stage('Copy Deployment & Service Definition to K8s Master') {
+    stage('Copy Deployment & Service Defination to K8s Master') {
       steps {
         sshagent(['ssh_agent']) {
           sh "scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i workstation-kp.pem deploy_service.yaml ubuntu@52.4.164.113:/home/ubuntu"
@@ -97,14 +103,17 @@ pipeline {
 
     stage('Waiting for Approvals') {
       steps {
-        input(message: 'Test Completed? Please provide Approvals for Prod Release', ok: 'Deploy to Production')
+        input('Test Completed ? Please provide Approvals for Prod Release ?')
       }
     }
 
     stage('Deploy Artifacts to Production') {
       steps {
         sshagent(['ssh_agent']) {
+          //sh "ssh -i workstation-kp.pem -o StrictHostKeyChecking=no ubuntu@52.4.164.113 -C \"kubectl set image deployment/ranty customcontainer=champion2010/devopspro_april_2025:${BUILD_NUMBER}\""
+          //sh "ssh -i workstation-kp.pem -o StrictHostKeyChecking=no ubuntu@52.4.164.113 -C \"kubectl delete deployment ranty && kubectl delete service ranty\""
           sh "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i workstation-kp.pem ubuntu@52.4.164.113 \"kubectl apply -f /home/ubuntu/deploy_service.yaml\""
+          //sh "ssh -i workstation-kp.pem -o StrictHostKeyChecking=no ubuntu@52.4.164.113 -C \"kubectl apply -f service.yaml\""
         }
       }
     }
